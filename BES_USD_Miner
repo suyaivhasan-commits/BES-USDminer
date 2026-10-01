@@ -1,0 +1,192 @@
+index.html
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BES Miner</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b1020;
+      color: white;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .logo {
+      width: 75px;
+      height: 75px;
+      margin: 20px auto;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #247cff, #7b2cff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #9ca8bd;
+      margin-bottom: 25px;
+    }
+
+    .balance {
+      background: #151d31;
+      border-radius: 20px;
+      padding: 25px;
+      text-align: center;
+      border: 1px solid #26314a;
+    }
+
+    .balance-title {
+      color: #9ca8bd;
+      font-size: 14px;
+    }
+
+    .amount {
+      font-size: 36px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .rate {
+      color: #5ee18c;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 15px;
+      border: 0;
+      border-radius: 14px;
+      background: #247cff;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .card {
+      background: #151d31;
+      border-radius: 18px;
+      padding: 18px;
+      margin-top: 18px;
+      border: 1px solid #26314a;
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .info {
+      color: #aeb8ca;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <div class="logo">BES</div>
+
+    <h1>BES Miner</h1>
+    <div class="subtitle">Mining-style Reward Platform</div>
+
+    <div class="balance">
+      <div class="balance-title">Your BES Balance</div>
+
+      <div class="amount" id="balance">0.000000</div>
+
+      <div class="rate">
+        Reward Rate: 0.001 BES / minute
+      </div>
+
+      <button onclick="startMining()" id="mineButton">
+        Start Mining
+      </button>
+    </div>
+
+    <div class="card">
+      <h3>📊 Mining Status</h3>
+      <div class="info" id="status">
+        Mining is currently stopped.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>👤 Account</h3>
+      <div class="info">
+        Telegram Mini App<br>
+        User ID: <span id="userId">Not connected</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+
+    let balance = 0;
+    let mining = false;
+    let timer = null;
+
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      document.getElementById("userId").innerText =
+        tg.initDataUnsafe.user.id;
+    }
+
+    function startMining() {
+
+      if (mining) return;
+
+      mining = true;
+
+      document.getElementById("mineButton").innerText =
+        "Mining Started";
+
+      document.getElementById("status").innerText =
+        "Reward is being calculated...";
+
+      timer = setInterval(function () {
+
+        balance += 0.001;
+
+        document.getElementById("balance").innerText =
+          balance.toFixed(6);
+
+      }, 60000);
+    }
+  </script>
+
+</body>
+</html>
