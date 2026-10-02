@@ -1,11 +1,15 @@
-index.html
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0,
+                 maximum-scale=1.0, user-scalable=no">
+
   <title>BES Miner</title>
 
+  <!-- Telegram Mini App -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
@@ -18,93 +22,92 @@ index.html
       font-family: Arial, sans-serif;
       background: #0b1020;
       color: white;
+      text-align: center;
     }
 
     .app {
-      max-width: 480px;
+      max-width: 500px;
       margin: auto;
-      padding: 20px;
+      padding: 25px 18px;
     }
 
     .logo {
-      width: 75px;
-      height: 75px;
-      margin: 20px auto;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #247cff, #7b2cff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      font-weight: bold;
+      font-size: 42px;
+      margin-top: 15px;
     }
 
     h1 {
-      text-align: center;
-      margin-bottom: 5px;
+      margin: 8px 0;
+      font-size: 30px;
     }
 
     .subtitle {
-      text-align: center;
-      color: #9ca8bd;
+      color: #9ca3af;
       margin-bottom: 25px;
     }
 
-    .balance {
-      background: #151d31;
+    .balance-card {
+      background: linear-gradient(135deg, #172554, #1e3a8a);
       border-radius: 20px;
       padding: 25px;
-      text-align: center;
-      border: 1px solid #26314a;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
     .balance-title {
-      color: #9ca8bd;
-      font-size: 14px;
+      color: #bfdbfe;
+      font-size: 15px;
     }
 
-    .amount {
-      font-size: 36px;
+    .balance {
+      font-size: 38px;
       font-weight: bold;
-      margin: 10px 0;
+      margin-top: 8px;
     }
 
-    .rate {
-      color: #5ee18c;
+    .status {
+      margin-top: 10px;
       font-size: 14px;
+      color: #cbd5e1;
     }
 
-    button {
+    .mine-button {
       width: 100%;
-      padding: 15px;
-      margin-top: 15px;
-      border: 0;
-      border-radius: 14px;
-      background: #247cff;
-      color: white;
-      font-size: 17px;
+      border: none;
+      border-radius: 16px;
+      padding: 18px;
+      font-size: 19px;
       font-weight: bold;
+      color: white;
+      background: #2563eb;
+      cursor: pointer;
+      margin-top: 10px;
     }
 
-    button:active {
+    .mine-button:active {
       transform: scale(0.98);
     }
 
-    .card {
-      background: #151d31;
-      border-radius: 18px;
-      padding: 18px;
-      margin-top: 18px;
-      border: 1px solid #26314a;
-    }
-
-    .card h3 {
-      margin-top: 0;
+    .mine-button.active {
+      background: #16a34a;
     }
 
     .info {
-      color: #aeb8ca;
-      line-height: 1.6;
+      margin-top: 20px;
+      background: #111827;
+      border-radius: 16px;
+      padding: 18px;
+      text-align: left;
+    }
+
+    .info p {
+      margin: 9px 0;
+      color: #d1d5db;
+    }
+
+    .user {
+      margin-top: 20px;
+      color: #94a3b8;
       font-size: 14px;
     }
   </style>
@@ -114,78 +117,170 @@ index.html
 
   <div class="app">
 
-    <div class="logo">BES</div>
+    <div class="logo">⛏️</div>
 
     <h1>BES Miner</h1>
-    <div class="subtitle">Mining-style Reward Platform</div>
 
-    <div class="balance">
-      <div class="balance-title">Your BES Balance</div>
-
-      <div class="amount" id="balance">0.000000</div>
-
-      <div class="rate">
-        Reward Rate: 0.001 BES / minute
-      </div>
-
-      <button onclick="startMining()" id="mineButton">
-        Start Mining
-      </button>
+    <div class="subtitle">
+      Telegram Mini App
     </div>
 
-    <div class="card">
-      <h3>📊 Mining Status</h3>
-      <div class="info" id="status">
-        Mining is currently stopped.
+    <div class="balance-card">
+
+      <div class="balance-title">
+        Current Balance
       </div>
+
+      <div class="balance">
+        $<span id="balance">0.00</span>
+      </div>
+
+      <div class="status" id="status">
+        Mining is currently OFF
+      </div>
+
     </div>
 
-    <div class="card">
-      <h3>👤 Account</h3>
-      <div class="info">
-        Telegram Mini App<br>
-        User ID: <span id="userId">Not connected</span>
-      </div>
+    <button
+      class="mine-button"
+      id="mineButton"
+      onclick="startMining()">
+      🚀 START MINING
+    </button>
+
+    <div class="info">
+
+      <p>⚡ Mining Rate: <b>$0.01 / minute</b></p>
+
+      <p>⏱️ Status:
+        <b id="statusText">Inactive</b>
+      </p>
+
+    </div>
+
+    <div class="user">
+      Telegram Mini App
     </div>
 
   </div>
 
+
   <script>
+
+    // Telegram WebApp
     const tg = window.Telegram.WebApp;
 
     tg.ready();
     tg.expand();
 
-    let balance = 0;
-    let mining = false;
-    let timer = null;
 
-    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-      document.getElementById("userId").innerText =
-        tg.initDataUnsafe.user.id;
+    // Balance
+    let balance = parseFloat(
+      localStorage.getItem("bes_balance") || "0"
+    );
+
+    let mining = localStorage.getItem("bes_mining") === "true";
+
+
+    // Elements
+    const balanceElement =
+      document.getElementById("balance");
+
+    const statusElement =
+      document.getElementById("status");
+
+    const statusText =
+      document.getElementById("statusText");
+
+    const mineButton =
+      document.getElementById("mineButton");
+
+
+    // Display balance
+    function updateBalance() {
+
+      balanceElement.innerText =
+        balance.toFixed(2);
+
     }
 
+
+    // Update mining UI
+    function updateMiningUI() {
+
+      if (mining) {
+
+        statusElement.innerText =
+          "Mining is currently ACTIVE";
+
+        statusText.innerText =
+          "Active";
+
+        mineButton.innerText =
+          "⛏️ MINING ACTIVE";
+
+        mineButton.classList.add("active");
+
+      } else {
+
+        statusElement.innerText =
+          "Mining is currently OFF";
+
+        statusText.innerText =
+          "Inactive";
+
+        mineButton.innerText =
+          "🚀 START MINING";
+
+        mineButton.classList.remove("active");
+
+      }
+
+    }
+
+
+    // Start mining
     function startMining() {
 
-      if (mining) return;
+      if (mining) {
+        return;
+      }
 
       mining = true;
 
-      document.getElementById("mineButton").innerText =
-        "Mining Started";
+      localStorage.setItem(
+        "bes_mining",
+        "true"
+      );
 
-      document.getElementById("status").innerText =
-        "Reward is being calculated...";
+      updateMiningUI();
 
-      timer = setInterval(function () {
-
-        balance += 0.001;
-
-        document.getElementById("balance").innerText =
-          balance.toFixed(6);
-
-      }, 60000);
     }
+
+
+    // Mining reward
+    setInterval(function() {
+
+      if (mining) {
+
+        balance += 0.01;
+
+        localStorage.setItem(
+          "bes_balance",
+          balance.toFixed(2)
+        );
+
+        updateBalance();
+
+      }
+
+    }, 60000);
+
+
+    // Initial display
+    updateBalance();
+    updateMiningUI();
+
   </script>
 
 </body>
